@@ -1,6 +1,7 @@
 package financialLedger;
 
 import java.util.*;
+import java.awt.*;
 
 public class CalendarClass {
   // Calendar 변수
@@ -8,7 +9,7 @@ public class CalendarClass {
   // 달력 요일
 	private String strcalColumn[] = {"일","월","화","수","목","금","토"};		
   // 달력 일
-	private int nCalDate[][] = new int[5][7];
+	private int nCalDate[][] = new int[6][7];
   
 	private int nCalMon;			// 달력 월
 	private int nStartDay;			// 달력 시작 일
@@ -22,12 +23,21 @@ public class CalendarClass {
 		nLastDay = cal.getActualMaximum(Calendar.DATE);
 		nCalMon = cal.get(Calendar.MONTH) + 1;
 	}
+	
   // 달력날짜 셋팅 
-	public void calSet(int year, int month, int day) {
-		
-	}
+	public void calSet(int year, int month) {
+	  // 달력 set
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, month-1);
+		cal.set(Calendar.DATE, 1);
+	  // 달력 출력값 set
+		nStartDay = cal.get(Calendar.DAY_OF_WEEK);
+		nLastDay = cal.getActualMaximum(Calendar.DATE);
+		nCalMon = cal.get(Calendar.MONTH) + 1;
+	} // calSet end
+	
   // 달력 값 set
-	public void claGet() {
+	public void calGet() {
 		int j=0, i;
 		for(i = 1; nInputDate<=nLastDay; i++) {
 			if(i<nStartDay) {
@@ -41,23 +51,22 @@ public class CalendarClass {
 			}
 		}
 		nInputDate = 1;
-	}
+	}// claGet end
+	
   // 달력출력
-	public void drawCalendar() {
-	// *Test 출력 (**수정예정**)
+	public void drawCalendar(int x, int y, Graphics gra) { // 43
 		for(int i = 0; i<strcalColumn.length; i++) {
-			System.out.print(strcalColumn[i] + "\t");
+			gra.drawString(strcalColumn[i], x+20+(50*i), y+30);
 		}
 		System.out.println();
 		for(int i = 0; i<nCalDate.length; i++) {
 			for(int j = 0; j<nCalDate[i].length; j++) {
 				if(nCalDate[i][j] == 0) {
-					System.out.print(" \t");
+					gra.drawString("\t", x+20+(50*i), y+80);
 				}else {
-					System.out.print(nCalDate[i][j] + "\t");
+					gra.drawString(Integer.toString(nCalDate[i][j]), x+20+(50*j), y+80+(50*i));
 				}
 			}
-			System.out.println();
 		}
-	}
-}
+	}// drawCalendar end
+}// CalendarClass end
