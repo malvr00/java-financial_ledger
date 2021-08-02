@@ -8,10 +8,6 @@ public class FinancialLedgerMain {
 		FinancialLedger_DAO db = new FinancialLedger_DAO();
 		frame = new FinancialLedger_Frame(db);
 		frame.setVisible(true);
-	 // 달력 Test 출력
-		CalendarClass ss = new CalendarClass();
-		ss.claGet();
-		ss.drawCalendar();
 	}
 
 }
