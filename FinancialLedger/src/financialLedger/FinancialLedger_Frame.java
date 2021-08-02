@@ -26,7 +26,7 @@ public class FinancialLedger_Frame extends JFrame{
   // 화면디자인	
 	public void initForm() {
 		setLayout(null);
-		setSize(800,600);
+		setSize(680,600);
 		Container cpane = getContentPane();
 		
 	  // Label
@@ -85,6 +85,7 @@ public class FinancialLedger_Frame extends JFrame{
 		
 		//cal.calSet(2021, 5);
 		cal.calGet();                   // 달력 Set
+		
 		repaint();
 	}// initForm end
 	
