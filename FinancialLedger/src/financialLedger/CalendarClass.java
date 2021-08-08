@@ -10,7 +10,8 @@ public class CalendarClass {
 	private String strcalColumn[] = {"일","월","화","수","목","금","토"};		
   // 달력 일
 	private int nCalDate[][] = new int[6][7];
-  
+	
+	private int nCalYear;			// 달력 년
 	private int nCalMon;			// 달력 월
 	private int nStartDay;			// 달력 시작 일
 	private int nLastDay;			// 달력 마지막 일
@@ -22,6 +23,7 @@ public class CalendarClass {
 		nStartDay = cal.get(Calendar.DAY_OF_WEEK);
 		nLastDay = cal.getActualMaximum(Calendar.DATE);
 		nCalMon = cal.get(Calendar.MONTH) + 1;
+		nCalYear = cal.get(Calendar.YEAR);
 	}
 	
   // 달력날짜 셋팅 
@@ -34,7 +36,18 @@ public class CalendarClass {
 		nStartDay = cal.get(Calendar.DAY_OF_WEEK);
 		nLastDay = cal.getActualMaximum(Calendar.DATE);
 		nCalMon = cal.get(Calendar.MONTH) + 1;
+		nCalYear = cal.get(Calendar.YEAR);
 	} // calSet end
+	
+  // 현재 달력 년 return
+	public int getYear() {
+		return nCalYear;
+	} // getYear end
+	
+  // 현재 달력 월 return
+	public int getMonth() {
+		return nCalMon;
+	} // getMonth end
 	
   // 달력 값 set
 	public void calGet() {
@@ -54,7 +67,7 @@ public class CalendarClass {
 	}// claGet end
 	
   // 달력출력
-	public void drawCalendar(int x, int y, Graphics gra) { // 43
+	public void drawCalendar(int x, int y, Graphics gra) {
 		for(int i = 0; i<strcalColumn.length; i++) {
 			gra.drawString(strcalColumn[i], x+20+(50*i), y+30);
 		}
