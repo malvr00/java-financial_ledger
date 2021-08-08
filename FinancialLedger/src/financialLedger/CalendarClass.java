@@ -37,6 +37,13 @@ public class CalendarClass {
 		nLastDay = cal.getActualMaximum(Calendar.DATE);
 		nCalMon = cal.get(Calendar.MONTH) + 1;
 		nCalYear = cal.get(Calendar.YEAR);
+		
+	  // 배열 초기화
+		for(int i = 0; i<nCalDate.length; i++) {
+			for(int j = 0; j<nCalDate[i].length; j++) {
+				nCalDate[i][j] = 0;
+			}
+		}
 	} // calSet end
 	
   // 현재 달력 년 return
@@ -71,7 +78,6 @@ public class CalendarClass {
 		for(int i = 0; i<strcalColumn.length; i++) {
 			gra.drawString(strcalColumn[i], x+20+(50*i), y+30);
 		}
-		System.out.println();
 		for(int i = 0; i<nCalDate.length; i++) {
 			for(int j = 0; j<nCalDate[i].length; j++) {
 				if(nCalDate[i][j] == 0) {
