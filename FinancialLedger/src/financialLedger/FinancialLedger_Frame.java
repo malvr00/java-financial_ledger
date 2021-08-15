@@ -3,9 +3,9 @@ package financialLedger;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.ResultSet;
 
 public class FinancialLedger_Frame extends JFrame{
-	private static final String HORIZONTAL_SCROLLBAR_AS_NEEDED = null;
 	private FinancialLedger_DAO db;
 	private CalendarClass cal;
 	
@@ -14,7 +14,8 @@ public class FinancialLedger_Frame extends JFrame{
 	private JButton addBt, beforeBt, nextBt;
 	private JLabel label1, label2, label3, label4, label5, label6, label7;
 	private int x = 20, y = 140;		// Rect 초기값
-	private String year, month;
+	private int size = 50;				// Rect Size
+	private String year, month, day;
 	public FinancialLedger_Frame(FinancialLedger_DAO db) {
 		super("용돈기입장");
 		this.db = db;
@@ -97,8 +98,10 @@ public class FinancialLedger_Frame extends JFrame{
 		nextBt.setBounds(x+295, y-60,50,20);
 		
 	  // Evnet 처리
-		beforeBt.addActionListener(new calMoveEvnet());
-		nextBt.addActionListener(new calMoveEvnet());
+		beforeBt.addActionListener(new calMoveEvnet());		// 달력 이전
+		nextBt.addActionListener(new calMoveEvnet());		// 달력 다음
+		addBt.addActionListener(new AddEventhandle());		// 사용내역 추가
+		cpane.addMouseListener(new MouseEventHandle());		// 달력 정보 얻기
 		
 		cpane.add(label1);
 		cpane.add(label2);
@@ -120,8 +123,6 @@ public class FinancialLedger_Frame extends JFrame{
 	
   // 달력 Frame
 	public void drawRects(Graphics gra) {
-		int size = 50;
-		
 		for(int row=0; row<7; row++) {
 			for(int col=0; col<7; col++) {
 				gra.drawRect(x+(col*size), y+(row*size), size, size);
@@ -135,12 +136,18 @@ public class FinancialLedger_Frame extends JFrame{
 		cal.drawCalendar(x,y,g);		// 달력 Draw
 	}// paint end
 	
+  // Button Event 
 	class calMoveEvnet implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			int nyear = Integer.parseInt(year);
 			int nmonth = Integer.parseInt(month);
 			if(e.getActionCommand() == "▼") {
 				nmonth--;
+				
+				if(nmonth<1) {		// 1월 이하로 내려가면 12월로 변경 && 이전 해로
+					nmonth = 12;
+					nyear--;
+				}
 				cal.calSet(nyear, nmonth);
 				
 				year = Integer.toString(nyear);
@@ -149,6 +156,12 @@ public class FinancialLedger_Frame extends JFrame{
 				label7.setText(month + "월");
 			}else {
 				nmonth++;
+				
+				if(nmonth>12) {		// 12월 초과하면 1월로 변경 && 다음 해로
+					nmonth = 1;
+					nyear++;
+				}
+				
 				cal.calSet(nyear, nmonth);
 				
 				year = Integer.toString(nyear);
@@ -159,5 +172,41 @@ public class FinancialLedger_Frame extends JFrame{
 			cal.calGet();
 			repaint();
 		}	
-	}
+	} // calMoveEvnet end
+	
+	class AddEventhandle implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			String sql;
+			ResultSet rs;
+			
+			sql  = "INSERT INTO book SET dYear = " + year + " dMonth = " + month + " dDay = " + day + " nExpense = " + discription.getText() +
+					" strUsageHistory = " + tf_money.getText();
+			db.Exectue(sql);
+			System.out.println(sql);
+			//tf_money
+		}
+	} // AddEventhandle end
+	
+  // Mouse Event
+	class MouseEventHandle extends MouseAdapter{
+		private int ndayX, ndayY;	// 화면의 달력 클릭 좌표
+		public void mouseClicked(MouseEvent e) {
+			if(e.getClickCount() == MouseEvent.BUTTON1) {
+				if(e.getX() < 355 && e.getY() < 459 && e.getY() > 160) {
+				 // 좌표를 Index화
+					ndayX = (e.getX() - 10) / 50;
+					ndayY = ((e.getY() - 110) / 50) - 1;
+				// 달력 일 얻기
+					day = Integer.toString(cal.getDay(ndayX, ndayY));
+					tf_cal.setText(year + "-" + month + "-" + day);
+					System.out.println(ndayX + "\t" + ndayY + "\tX = " + e.getX() + "Y = " + e.getY());
+					System.out.println(day);
+				}else {
+					System.out.println("범위를 벗아났습니다."); // 임시
+				}
+			}
+		}
+	} // MouseEventHandle end
+	
+	
 }
