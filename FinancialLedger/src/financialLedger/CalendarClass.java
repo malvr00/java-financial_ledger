@@ -56,6 +56,11 @@ public class CalendarClass {
 		return nCalMon;
 	} // getMonth end
 	
+  // 현재 달력 일 return
+	public int getDay(int x, int y) {
+		return nCalDate[y][x];
+	}
+	
   // 달력 값 set
 	public void calGet() {
 		int j=0, i;
