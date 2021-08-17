@@ -13,7 +13,9 @@ public class FinancialLedger_Frame extends JFrame{
 	private JTextField tf_cal, tf_money, tf_yeartot, tf_monthtot;
 	private JTextArea discription;
 	private JButton addBt, beforeBt, nextBt;
-	private JLabel label1, label2, label3, label4, label5, label6, label7;
+	private JComboBox <String> categoryBox;
+	private String dataModel[] = {"식대", "교통비", "생활비"};
+	private JLabel label1, label2, label3, label4, label5, label6, label7, label8;
 	private int x = 20, y = 140;			// Rect 초기값
 	private int size = 50;					// Rect Size
 	private String year, month, day;		// 년, 월, 일 
@@ -47,6 +49,7 @@ public class FinancialLedger_Frame extends JFrame{
 		label5 = new JLabel("총 월 사용금액");
 		label6 = new JLabel();
 		label7 = new JLabel();
+		label8 = new JLabel();			// 카테고리
 	  // Text Field
 		tf_cal = new JTextField();
 		tf_money = new JTextField();
@@ -54,6 +57,9 @@ public class FinancialLedger_Frame extends JFrame{
 		tf_yeartot = new JTextField(yeartotal + "원");
 		
 		discription = new JTextArea();
+		
+	  // ComboBox
+		categoryBox = new JComboBox<String>(new DefaultComboBoxModel<String>(dataModel));
 		
 	  // Button 
 		addBt = new JButton("추가");
