@@ -8,13 +8,16 @@ import java.sql.*;
 public class FinancialLedger_Frame extends JFrame{
 	private FinancialLedger_DAO db;
 	private CalendarClass cal;
-	
-	private JDialog dlg1;  // 일일 사용내역 확인용
+	private DlgDetail dlg2; // 사용내역 상세보기용
+	private JDialog dlg1;   // 일일 사용내역 확인용
 	private JTextField tf_cal, tf_money, tf_yeartot, tf_monthtot;
 	private JTextArea discription;
-	private JButton addBt, beforeBt, nextBt;
+	private JButton addBt, beforeBt, nextBt, detailBt;
 	private JComboBox <String> categoryBox;
-	private String dataModel[] = {"식대", "교통비", "생활비"};
+	
+  // 1001 식대, 1002 교통비, 1003 생활비, 1004 수입
+	private String dataModel[] = {"식대", "교통비", "생활비", "수입"};		
+	
 	private JLabel label1, label2, label3, label4, label5, label6, label7, label8;
 	private int x = 20, y = 140;			// Rect 초기값
 	private int size = 50;					// Rect Size
@@ -49,7 +52,7 @@ public class FinancialLedger_Frame extends JFrame{
 		label5 = new JLabel("총 월 사용금액");
 		label6 = new JLabel();
 		label7 = new JLabel();
-		label8 = new JLabel();			// 카테고리
+		label8 = new JLabel("카테고리");
 	  // Text Field
 		tf_cal = new JTextField();
 		tf_money = new JTextField();
@@ -65,6 +68,7 @@ public class FinancialLedger_Frame extends JFrame{
 		addBt = new JButton("추가");
 		beforeBt = new JButton("▼");
 		nextBt = new JButton("▲");
+		detailBt = new JButton("상세보기");
 		
 	  // Text Field 사용여부
 		tf_cal.setEnabled(false);
@@ -105,11 +109,16 @@ public class FinancialLedger_Frame extends JFrame{
 		
 		beforeBt.setBounds(x+240, y-60,50,20);
 		nextBt.setBounds(x+295, y-60,50,20);
+		detailBt.setBounds(445, 425, 90, 20);
+		
+		label8.setBounds(380, y-80, 60, 60);
+		categoryBox.setBounds(565, y-65, 80, 30);
 		
 	  // Event 처리
 		beforeBt.addActionListener(new calMoveEvnet());		// 달력 이전
 		nextBt.addActionListener(new calMoveEvnet());		// 달력 다음
 		addBt.addActionListener(new AddEventhandle());		// 사용내역 추가
+		detailBt.addActionListener(new viewsEvent());		// 사용내역 상세보기
 		cpane.addMouseListener(new MouseEventHandle());		// 달력 정보 얻기
 		
 		cpane.add(label1);
@@ -119,6 +128,7 @@ public class FinancialLedger_Frame extends JFrame{
 		cpane.add(label5);
 		cpane.add(label6);
 		cpane.add(label7);
+		cpane.add(label8);
 		cpane.add(tf_cal);
 		cpane.add(tf_money);
 		cpane.add(tf_yeartot);
@@ -127,9 +137,12 @@ public class FinancialLedger_Frame extends JFrame{
 		cpane.add(addBt);
 		cpane.add(beforeBt);
 		cpane.add(nextBt);
+		cpane.add(detailBt);
+		cpane.add(categoryBox);
 		repaint();
 	}// initForm end
 	
+  // Dialog ( 쪽지형식 Dlg )
 	public void dlgDesign() {
 		ResultSet rs;
 		int expense;			// 사용금액
@@ -171,6 +184,12 @@ public class FinancialLedger_Frame extends JFrame{
 		dlg1.pack();
 		dlg1.setVisible(true);
 	} // dlgDesign end
+	
+// 상세보기 Dlg
+	public void dlgDetails() {
+		dlg2 = new DlgDetail(this, db, "상세보기");
+		dlg2.dlginitForm();
+	} // dlgDetails end
 	
 // ************************ Count Query **********************//
  // 일일 사용내역 개수 Count
@@ -285,15 +304,15 @@ public class FinancialLedger_Frame extends JFrame{
 	class AddEventhandle implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			String sql;
-			
+			int categoryNo;
 		// ************ 입력받은 날 사용 금액 & 사용용도 ( Insert ) ************ // 
 			if(discription.getText().equals("")) {	// 입력된값 없으면 error
 				System.out.println("입력누락");	// 임시
 			}else {
-				sql  = "INSERT INTO book (dYear, dMonth, dDay, nExpense, strUsageHistory) VALUES('"+ year + "', '" + month + "', '" + day + "', " 
-						+ Integer.parseInt(tf_money.getText()) + ", '" + discription.getText() + "')";
+				categoryNo = categoryChange();
+				sql  = "INSERT INTO book (dYear, dMonth, dDay, nExpense, strUsageHistory, category) VALUES('"+ year + "', '" + month + "', '" + day + "', " 
+						+ Integer.parseInt(tf_money.getText()) + ", '" + discription.getText() + "', " + categoryNo + ")";
 				db.Exectue(sql);
-				
 				totalset();
 				tf_monthtot.setText(monthtotal + "원");
 				tf_yeartot.setText(yeartotal + "원");
@@ -304,6 +323,13 @@ public class FinancialLedger_Frame extends JFrame{
 			discription.setText("");
 		}
 	} // AddEventhandle end
+	
+  // dlg 상세보기 Button Event
+	class viewsEvent implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			dlgDetails();		// 상세보기 창 띄우기
+		}
+	}
 	
   // Mouse Event
 	class MouseEventHandle extends MouseAdapter{
@@ -319,6 +345,7 @@ public class FinancialLedger_Frame extends JFrame{
 					tf_cal.setText(year + "-" + month + "-" + day);
 				}else {
 					System.out.println("범위를 벗아났습니다."); // 임시
+					repaint();
 				}
 			}else if(e.getButton() == MouseEvent.BUTTON3){ // ** Mouse right Click
 				dlgDesign();
@@ -330,6 +357,28 @@ public class FinancialLedger_Frame extends JFrame{
 	public void totalset() {
 		yeartotal = (totalamount("y") != null)?totalamount("y"): "0";
 		monthtotal = (totalamount("m") != null)?totalamount("m"):"0";
-	}// end
+	}// totalset end
 	
+ // 카테고리 코드화
+	public int categoryChange() {
+		// 1001 식대, 1002 교통비, 1003 생활비, 1004 수입
+		int cateNo = categoryBox.getSelectedIndex();		// Category Combo Box Index
+		int category = 0;
+		switch(cateNo) {
+			case 0:		// 식대
+				category = 1001;
+				break;
+			case 1:		// 교통비
+				category = 1002;
+				break;
+			case 2:		// 생활비
+				category = 1003;
+				break;
+			case 3:		// 수입
+				category = 1004;
+				break;
+		}
+		
+		return category;
+	} // categoryChange
 }
