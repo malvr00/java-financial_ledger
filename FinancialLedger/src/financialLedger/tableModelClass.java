@@ -56,10 +56,5 @@ public class tableModelClass extends AbstractTableModel {
 	public String getColumnName(int col) {
 		return columnName[col];
 	} // getColumnName end
-	
-	public boolean isCellEdittable(int row, int col) {
-		boolean bool = (col!=0)?true:false;		// 0 번째 열 외 수정 가능하게
-		return bool;							// return true : 모두 수정 가능, return false : 모두 수정 불가능
-	}	// isCellEdittable end
 
 } // tableModelClass end
