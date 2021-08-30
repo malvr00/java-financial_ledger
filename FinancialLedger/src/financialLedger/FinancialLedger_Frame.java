@@ -10,19 +10,21 @@ public class FinancialLedger_Frame extends JFrame{
 	private CalendarClass cal;
 	private DlgDetail dlg2; // 사용내역 상세보기용
 	private JDialog dlg1;   // 일일 사용내역 확인용
-	private JTextField tf_cal, tf_money, tf_yeartot, tf_monthtot;
+	private JTextField tf_cal, tf_money, tf_yeartot, tf_monthtot, tf_yearIncome, tf_monthIncome;
 	private JTextArea discription;
 	private JButton addBt, beforeBt, nextBt, detailBt;
 	private JComboBox <String> categoryBox;
 	
   // 1001 식대, 1002 교통비, 1003 생활비, 1004 수입
-	private String dataModel[] = {"식대", "교통비", "생활비", "수입"};		
+	private String dataModel[] = {"식대", "교통비", "생활비", "소득"};		
 	
-	private JLabel label1, label2, label3, label4, label5, label6, label7, label8;
+	private JLabel label1, label2, label3, label4, label5, label6, label7, label8, label9, label10;
 	private int x = 20, y = 140;			// Rect 초기값
 	private int size = 50;					// Rect Size
 	private String year, month, day;		// 년, 월, 일 
-	private String yeartotal, monthtotal;	// 년 총 금액, 월 총 금액
+	private String yeartotal, monthtotal;	// 년 총 지출, 월 총 지출
+	private String yearincome, monthincome; // 년 총 소득, 월 총 소득
+	private int categoryNo;					// 카테고리 Code
 	public FinancialLedger_Frame(FinancialLedger_DAO db) {
 		super("용돈기입장");
 		this.db = db;
@@ -41,24 +43,28 @@ public class FinancialLedger_Frame extends JFrame{
   // 화면디자인	
 	public void initForm() {
 		setLayout(null);
-		setSize(680,600);
+		setSize(680,620);
 		Container cpane = getContentPane();
 		
 	  // Label
 		label1 = new JLabel("날짜");
-		label2 = new JLabel("사용금액");
-		label3 = new JLabel("사용내역");
-		label4 = new JLabel("총 년 사용금액");
-		label5 = new JLabel("총 월 사용금액");
+		label2 = new JLabel("금액");
+		label3 = new JLabel("내역");
+		label4 = new JLabel("총 년 지출금액");
+		label5 = new JLabel("총 월 지출금액");
 		label6 = new JLabel();
 		label7 = new JLabel();
 		label8 = new JLabel("카테고리");
+		label9 = new JLabel("총 년 소득금액");
+		label10 = new JLabel("총 월 소득금액");
+		
 	  // Text Field
 		tf_cal = new JTextField();
 		tf_money = new JTextField();
 		tf_monthtot = new JTextField(monthtotal + "원");					
 		tf_yeartot = new JTextField(yeartotal + "원");
-		
+		tf_yearIncome = new JTextField(yearincome + "원");
+		tf_monthIncome = new JTextField(monthincome + "원");
 		discription = new JTextArea();
 		
 	  // ComboBox
@@ -74,10 +80,12 @@ public class FinancialLedger_Frame extends JFrame{
 		tf_cal.setEnabled(false);
 		tf_yeartot.setEnabled(false);
 		tf_monthtot.setEnabled(false);
-		
+		tf_yearIncome.setEnabled(false);
+		tf_monthIncome.setEnabled(false);
 		tf_yeartot.setHorizontalAlignment(JTextField.RIGHT);
 		tf_monthtot.setHorizontalAlignment(JTextField.RIGHT);
-		
+		tf_yearIncome.setHorizontalAlignment(JTextField.RIGHT);
+		tf_monthIncome.setHorizontalAlignment(JTextField.RIGHT);		
 		
 	  // Scroll 설정
 		discription.setLineWrap(true);
@@ -100,6 +108,12 @@ public class FinancialLedger_Frame extends JFrame{
 		
 		label5.setBounds(350,470, 80, 60);
 		tf_monthtot.setBounds(450,485,200, 30);
+		
+		label9.setBounds(10,510, 80, 60);
+		tf_yearIncome.setBounds(110, 525, 200, 30);
+		
+		label10.setBounds(350, 510, 80, 60);
+		tf_monthIncome.setBounds(450, 525, 200, 30);
 		
 		addBt.setBounds(585, 425, 60, 20);
 		label6.setText(year);
@@ -129,6 +143,8 @@ public class FinancialLedger_Frame extends JFrame{
 		cpane.add(label6);
 		cpane.add(label7);
 		cpane.add(label8);
+		cpane.add(label9);
+		cpane.add(label10);
 		cpane.add(tf_cal);
 		cpane.add(tf_money);
 		cpane.add(tf_yeartot);
@@ -139,6 +155,8 @@ public class FinancialLedger_Frame extends JFrame{
 		cpane.add(nextBt);
 		cpane.add(detailBt);
 		cpane.add(categoryBox);
+		cpane.add(tf_yearIncome);
+		cpane.add(tf_monthIncome);
 		repaint();
 	}// initForm end
 	
@@ -154,7 +172,7 @@ public class FinancialLedger_Frame extends JFrame{
 		pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
 		
 	  // Dialog 생성
-		dlg1 = new JDialog(this, "일일사용내역", true);
+		dlg1 = new JDialog(this, "일일내역", true);
 		dlg1.add(new JLabel(year + "년 " + month + "월 " + day + "일 "), "North");
 		
 	 // ********************************* 사용금액 및 사용용도 불러오기 ( Select ) ********************************* // 
@@ -170,7 +188,7 @@ public class FinancialLedger_Frame extends JFrame{
 					rs.next();
 					expense = rs.getInt("nExpense");
 					usageHistory = rs.getString("strUsageHistory");
-					pan.add(new JLabel("사용금액 : " + Integer.toString(expense) + "원 | " + "사용내역 : " + usageHistory));
+					pan.add(new JLabel("금액 : " + Integer.toString(expense) + "원 | " + "내역 : " + usageHistory));
 				}				
 			}
 		}catch(SQLException e) {
@@ -187,7 +205,7 @@ public class FinancialLedger_Frame extends JFrame{
 	
 // 상세보기 Dlg
 	public void dlgDetails() {
-		dlg2 = new DlgDetail(this, db, "상세보기");
+		dlg2 = new DlgDetail(this, db, "상세보기", FinancialLedger_Frame.this);
 		dlg2.dlginitForm();
 	} // dlgDetails end
 	
@@ -217,16 +235,30 @@ public class FinancialLedger_Frame extends JFrame{
 	} // seachDay end
 	
 // ************************ 사용 총 금액 Query ************************ //
-	public String totalamount(String sw) {
+	public String totalamount(String sw, String strYear, String strMonth, int nCategory) {
 		ResultSet rs;
 		ResultSetMetaData meta;
 		
 		String sql, total = null;
 	  // ************ Select Sum | nExpense Total ************ //
-		if(sw == "y") // y 입력받을 시 년 총액 계산
-			sql = "SELECT sum(nExpense) as total FROM book WHERE dYear='" + year + "'";
-		else 
-			sql = "SELECT sum(nExpense) as total FROM book WHERE dMonth='" + month + "'";
+		if(nCategory == 0) {		// 0 입력시 년, 월 총 금액계산
+		 // 년 - 월 총 금액계산
+			if(sw == "y") // y 입력받을 시 년 총액 계산
+			// 소득은 검색에서 제외
+				sql = "SELECT sum(nExpense) as total FROM book WHERE dYear='" + strYear + "' AND category NOT IN(1004)";
+			else 
+				sql = "SELECT sum(nExpense) as total FROM book WHERE dMonth='" + strMonth + "' AND dMonth='" + strMonth + 
+				"'AND category NOT IN(1004)";			
+		}else {
+		 // 카테고리 별 총 금액계산
+			if(sw == "y") // y 입력받을 시 년 총액 계산
+				sql = "SELECT sum(nExpense) as total FROM book WHERE dYear='" + strYear + "' AND category = "
+						+ nCategory;
+			else 
+				sql = "SELECT sum(nExpense) as total FROM book WHERE dYear='" + strYear + "' AND dMonth='" + strMonth + "' AND category = "
+						+ nCategory;
+			
+		}
 	  
 		
 		rs = db.getResultSet(sql);
@@ -277,6 +309,8 @@ public class FinancialLedger_Frame extends JFrame{
 				totalset();
 				tf_monthtot.setText(monthtotal + "원");
 				tf_yeartot.setText(yeartotal + "원");
+				tf_yearIncome.setText(yearincome + "원");
+				tf_monthIncome.setText(monthincome + "원");
 			}else {
 				nmonth++;
 				
@@ -295,6 +329,8 @@ public class FinancialLedger_Frame extends JFrame{
 				totalset();
 				tf_monthtot.setText(monthtotal + "원");
 				tf_yeartot.setText(yeartotal + "원");
+				tf_yearIncome.setText(yearincome + "원");
+				tf_monthIncome.setText(monthincome + "원");
 			}
 			cal.calGet();
 			repaint();
@@ -304,18 +340,19 @@ public class FinancialLedger_Frame extends JFrame{
 	class AddEventhandle implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			String sql;
-			int categoryNo;
 		// ************ 입력받은 날 사용 금액 & 사용용도 ( Insert ) ************ // 
 			if(discription.getText().equals("")) {	// 입력된값 없으면 error
 				System.out.println("입력누락");	// 임시
 			}else {
-				categoryNo = categoryChange();
+				categoryNo = categoryChange(categoryBox.getSelectedIndex());
 				sql  = "INSERT INTO book (dYear, dMonth, dDay, nExpense, strUsageHistory, category) VALUES('"+ year + "', '" + month + "', '" + day + "', " 
 						+ Integer.parseInt(tf_money.getText()) + ", '" + discription.getText() + "', " + categoryNo + ")";
 				db.Exectue(sql);
 				totalset();
 				tf_monthtot.setText(monthtotal + "원");
 				tf_yeartot.setText(yeartotal + "원");
+				tf_yearIncome.setText(yearincome + "원");
+				tf_monthIncome.setText(monthincome + "원");
 			}
 			
 		// Text reset
@@ -355,14 +392,16 @@ public class FinancialLedger_Frame extends JFrame{
 
   // 년 & 월 총 지출내역 Set
 	public void totalset() {
-		yeartotal = (totalamount("y") != null)?totalamount("y"): "0";
-		monthtotal = (totalamount("m") != null)?totalamount("m"):"0";
+		yearincome  = (totalamount("y", year, month, 1004) != null)?totalamount("y", year, month, 1004): "0";		// 소득 년 총액
+		monthincome = (totalamount("m", year, month, 1004) != null)?totalamount("m", year, month, 1004): "0";		// 소득 월 총액
+		yeartotal   = (totalamount("y", year, month, 0) != null)?totalamount("y", year, month, 0): "0";				// 지출 년 총액
+		monthtotal  = (totalamount("m", year, month, 0) != null)?totalamount("m", year, month, 0):"0";				// 지출 월 총액
 	}// totalset end
 	
  // 카테고리 코드화
-	public int categoryChange() {
+	public int categoryChange(int comboBoxIndex) {
 		// 1001 식대, 1002 교통비, 1003 생활비, 1004 수입
-		int cateNo = categoryBox.getSelectedIndex();		// Category Combo Box Index
+		int cateNo = comboBoxIndex;		// Category Combo Box Index
 		int category = 0;
 		switch(cateNo) {
 			case 0:		// 식대
