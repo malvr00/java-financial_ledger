@@ -4,10 +4,11 @@
 
 ## main Class [[코드]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedgerMain.java)
 1. '▲', '▼' 클릭하여 날짜 조정  [[코드]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedger_Frame.java#L291-L338)
-2. 카테고리와 날짜를 선택하여 기록 & 저장<br/>
+2. 달력을 왼쪽 마우스로 클릭하여 날짜 지정
+3. 카테고리와 날짜를 선택하여 기록 & 저장<br/>
    <img src="https://user-images.githubusercontent.com/77275513/131303653-701ee612-133f-469a-bfce-8b6b0a68b5b5.PNG" width="600px" height="300px" title="100px" alt="RubberDuck"></img><br/><br/>
    
-1. 마우스 오른쪽 클릭시 선택한 요일에 등록한 기록 보여줌 [[코드]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedger_Frame.java#L163-L204) [[요일별 등록 개수 카운트]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedger_Frame.java#L213-L235)
+1. 달력에 보고싶은 날을 마우스 오른쪽 클릭시 선택한 요일에 등록한 기록 보여줌 [[코드]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedger_Frame.java#L163-L204) [[요일별 등록 개수 카운트]](https://github.com/malvr00/java-financial_ledger/blob/main/FinancialLedger/src/financialLedger/FinancialLedger_Frame.java#L213-L235)
 <br/>
    <img src="https://user-images.githubusercontent.com/77275513/131304453-1e9652c3-73a9-4d7c-9b94-cc758c94ccc2.PNG" width="600px" height="300px" title="100px" alt="RubberDuck"></img><br/><br/>
 
